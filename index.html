@@ -2,63 +2,74 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Selecionar Cidade TJ-SP</title>
+
     <style>
+        /* ===== RESET ===== */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
         body {
             font-family: Arial, sans-serif;
-            background: #f2f2f2;
-            margin: 0;
+            background: #eef1f5;
             padding: 20px;
-            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
         }
 
         h2 {
-            margin-bottom: 20px;
+            margin-bottom: 25px;
+            font-size: 26px;
+            color: #333;
         }
 
+        /* ===== CONTAINER ===== */
         #listaCidades {
-            max-width: 400px;
-            margin: 0 auto;
+            width: 100%;
+            max-width: 500px;
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 15px;
         }
 
+        /* ===== BOTÕES ===== */
         .cidade-btn {
-            padding: 12px;
+            width: 100%;
+            padding: 18px;
             border: none;
-            border-radius: 8px;
+            border-radius: 14px;
             background: linear-gradient(135deg, #4a90e2, #357ABD);
             color: white;
-            font-size: 16px;
+            font-size: 1.2rem;
             cursor: pointer;
-            box-shadow: 0 3px 6px rgba(0,0,0,0.15);
-            transition: transform 0.15s, opacity 0.2s;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+            transition: transform 0.15s ease, opacity 0.2s ease;
         }
 
         .cidade-btn:hover {
-            opacity: 0.9;
+            opacity: 0.92;
             transform: scale(1.03);
         }
 
+        /* ===== RESPONSIVIDADE MOBILE ===== */
         @media (max-width: 600px) {
-            .cidade-btn {
-                font-size: 18px;
-                padding: 14px;
-            }
-        }
-    </style>
-<style>
-        @media (max-width: 600px) {
-            button {
-                width: 100% !important;
-                padding: 18px !important;
-                font-size: 1.2rem !important;
-                margin: 10px 0 !important;
-                border-radius: 12px !important;
-            }
             body {
-                padding: 12px !important;
+                padding: 15px;
+            }
+            h2 {
+                font-size: 22px;
+                text-align: center;
+            }
+            .cidade-btn {
+                font-size: 1.3rem;
+                padding: 20px;
+                border-radius: 16px;
             }
         }
     </style>

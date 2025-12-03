@@ -2,10 +2,15 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1"> <!-- VIEWPORT IMPORTANTÍSSIMO -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Editar Convocações</title>
 
     <style>
+        :root{
+            --gap: 12px;
+            --card-radius: 12px;
+        }
+
         body {
             font-family: Arial, sans-serif;
             background: #f2f2f2;
@@ -19,7 +24,6 @@
             font-size: 1.6rem;
         }
 
-        /* LAYOUT DESKTOP */
         .container {
             display: flex;
             gap: 20px;
@@ -28,9 +32,9 @@
         .coluna {
             flex: 1;
             background: #fff;
-            border-radius: 12px;
+            border-radius: var(--card-radius);
             padding: 14px;
-            box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+            box-shadow: 0 3px 8px rgba(0,0,0,0.12);
             display: flex;
             flex-direction: column;
         }
@@ -43,114 +47,132 @@
             background: linear-gradient(135deg, #efefef, #d8d8d8);
             padding: 14px;
             border-radius: 8px;
-            font-size: 1.2rem;
+            font-size: 1.15rem;
             user-select: none;
-            transition: 0.2s;
-        }
-
-        .header:hover {
-            background: #cfcfcf;
         }
 
         .lista {
             margin-top: 12px;
         }
 
+        /* ITEM: usa flex em colunas com linhas internas controladas */
         .item {
             margin: 12px 0;
             padding: 14px;
-            border: 1px solid #ddd;
+            border: 1px solid #e0e0e0;
             border-radius: 10px;
             background: #fafafa;
-            font-size: 1.1rem;
-            line-height: 1.4rem;
+            font-size: 1.05rem;
+            display: flex;
+            flex-direction: column;
+            gap: var(--gap);
         }
 
-        /* Inputs maiores no touch */
+        .item .title {
+            font-weight: 700;
+            overflow-wrap: anywhere;
+        }
+
+        /* linha de campos: data e checkbox alinhados */
+        .field-row {
+    display: flex;
+    align-items: center; 
+    gap: 16px;
+    width: 100%;
+}
+
+.field-row label {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    align-items: flex-end;
+    gap: 8px;
+    height: 45px; /* força altura igual à do input date */
+}
+
+
+        .date-field {
+            flex: 1;                   /* ocupa o máximo possível */
+            min-width: 0;              /* importante para inputs flexíveis não estourarem */
+        }
+
+        /* garante que o date não vaze e respeite o box */
         input[type="date"] {
+            width: 100%;
+            box-sizing: border-box;
             padding: 10px;
-            font-size: 1rem;
             border-radius: 8px;
+            border: 1px solid #d0d0d0;
+            font-size: 1rem;
+            background: white;
         }
 
+        /* checkbox e texto juntos e centralizados */
+        .checkbox-label {
+            display: flex;
+            align-items: flex-end;
+            gap: 8px;
+            white-space: nowrap;
+        }
+
+        /* deixa o checkbox maior e ainda alinhado */
         input[type="checkbox"] {
-            width: 26px;
-            height: 26px;
+            width: 22px;
+            height: 22px;
+            transform: scale(1.05);
+            margin: 0;
             cursor: pointer;
         }
 
-        button {
-            padding: 12px 16px;
+        /* ações / botões */
+        .actions {
+            display: flex;
+            gap: 8px;
+            justify-content: flex-start;
+            flex-wrap: wrap;
+        }
+
+        .actions button {
+            padding: 12px 14px;
             font-size: 1rem;
             border: none;
             border-radius: 10px;
             cursor: pointer;
-            margin-top: 8px;
         }
 
-        button:hover {
-            opacity: 0.9;
-        }
+        .btn-ok { background: #16a34a; color: white; }
+        .btn-copiar { background: #0ea5e9; color: white; }
 
-        .btn-ok {
-            background: #4CAF50;
-            color: white;
-        }
-
-        .btn-copiar {
-            background: #2196F3;
-            color: white;
-            margin-left: 6px;
-        }
-
-        /* RESPONSIVIDADE MOBILE */
+        /* responsividade */
         @media (max-width: 900px) {
-            .container {
-                flex-direction: column;
-            }
+            .container { flex-direction: column; }
         }
 
         @media (max-width: 600px) {
-
-            h2 {
-                font-size: 1.4rem;
-            }
-
-            .coluna {
-                width: 100%;
-                padding: 16px;
-            }
-
-            .header {
-                font-size: 1.3rem;
-                padding: 16px;
-            }
+            h2 { font-size: 1.4rem; }
 
             .item {
-                font-size: 1.2rem;
                 padding: 16px;
+                font-size: 1.15rem;
             }
 
-            input[type="date"] {
+            .actions {
+                flex-direction: column;
+            }
+
+            .actions button {
                 width: 100%;
-                font-size: 1.1rem;
-                margin-top: 6px;
-            }
-
-            button {
-                width: 100%;
-                font-size: 1.1rem;
-                padding: 16px;
-                margin-top: 10px;
-            }
-
-            .btn-copiar {
-                margin-left: 0;
             }
 
             input[type="checkbox"] {
-                width: 30px;
-                height: 30px;
+                width: 28px;
+                height: 28px;
+                transform: none;
             }
         }
     </style>
@@ -219,21 +241,27 @@
                     const item = document.createElement("div");
                     item.className = "item";
 
+                    // estrutura com field-row e actions para controle de layout
                     item.innerHTML = `
-                        <b>${pessoa.Classif_Final}</b> - ${pessoa.Nome}<br><br>
+                        <div class="title"><b>${pessoa.Classif_Final}</b> - ${pessoa.Nome}</div>
 
-                        <label>
-                            Data:<br>
-                            <input type="date" id="data_${tipo}_${index}">
-                        </label><br><br>
+                        <div class="field-row">
+                            <div class="date-field">
+                                <label>Data:<br>
+                                    <input type="date" id="data_${tipo}_${index}">
+                                </label>
+                            </div>
 
-                        <label>
-                            Convocado:
-                            <input type="checkbox" id="check_${tipo}_${index}">
-                        </label><br><br>
+                            <div class="checkbox-label">
+                                <input type="checkbox" id="check_${tipo}_${index}">
+                                <span>Convocado</span>
+                            </div>
+                        </div>
 
-                        <button class="btn-ok" id="ok_${tipo}_${index}">OK</button>
-                        <button class="btn-copiar" id="copiar_${tipo}_${index}">Copiar Nome</button>
+                        <div class="actions">
+                            <button class="btn-ok" id="ok_${tipo}_${index}">OK</button>
+                            <button class="btn-copiar" id="copiar_${tipo}_${index}">Copiar Nome</button>
+                        </div>
                     `;
 
                     div.appendChild(item);

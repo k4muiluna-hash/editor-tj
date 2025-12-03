@@ -182,17 +182,17 @@
     <h2 id="titulo"></h2>
 
     <div class="container">
-        <div class="coluna">
+        <div class="coluna coluna-especiais">
             <div class="header" onclick="toggleLista('especiais_lista')">Especiais ▼</div>
             <div id="especiais_lista" class="lista"></div>
         </div>
 
-        <div class="coluna">
+        <div class="coluna coluna-negros">
             <div class="header" onclick="toggleLista('negros_lista')">Negros ▼</div>
             <div id="negros_lista" class="lista"></div>
         </div>
 
-        <div class="coluna">
+        <div class="coluna coluna-geral">
             <div class="header" onclick="toggleLista('geral_lista')">Geral ▼</div>
             <div id="geral_lista" class="lista"></div>
         </div>
@@ -227,9 +227,27 @@
             const snap = await get(ref(db, cidade));
             const dados = snap.val();
 
-            montarLista("especiais", dados.especiais, divEspeciais);
-            montarLista("negros", dados.negros, divNegros);
-            montarLista("geral", dados.geral, divGeral);
+            if (dados.especiais) {
+    document.querySelector('.coluna-especiais').style.display = "block";
+    montarLista("especiais", dados.especiais, divEspeciais);
+} else {
+    document.querySelector('.coluna-especiais').style.display = "none";
+}
+
+if (dados.negros) {
+    document.querySelector('.coluna-negros').style.display = "block";
+    montarLista("negros", dados.negros, divNegros);
+} else {
+    document.querySelector('.coluna-negros').style.display = "none";
+}
+
+if (dados.geral) {
+    document.querySelector('.coluna-geral').style.display = "block";
+    montarLista("geral", dados.geral, divGeral);
+} else {
+    document.querySelector('.coluna-geral').style.display = "none";
+}
+
         }
 
         function montarLista(tipo, lista, div) {

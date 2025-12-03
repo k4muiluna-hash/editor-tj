@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Editar Convocações</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f2f2f2;
+            margin: 0;
+            padding: 10px;
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .container {
+            display: flex;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .coluna {
+            flex: 1;
+            background: #fff;
+            border-radius: 10px;
+            padding: 10px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+            display: flex;
+            flex-direction: column;
+            height: auto;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            background: linear-gradient(135deg, #ececec, #dcdcdc);
+            padding: 10px;
+            border-radius: 6px;
+            font-weight: bold;
+            user-select: none;
+            transition: background 0.25s, transform 0.15s;
+        }
+
+        .header:hover {
+            background: #dcdcdc;
+        }
+
+        .lista {
+            margin-top: 10px;
+        }
+
+        .item {
+            margin: 10px 0;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            background: #fafafa;
+        }
+
+        button {
+            padding: 6px 10px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            opacity: 0.85;
+        }
+
+        #ok {
+            background: #4CAF50;
+            color: white;
+        }
+
+        #copiar {
+            background: #2196F3;
+            color: white;
+        }
+
+        /* Responsividade */
+        @media (max-width: 900px) {
+            .container {
+                flex-direction: column !important;
+                width: 100% !important;
+            }
+            .coluna {
+                width: 100% !important;
+                max-width: 100% !important;
+            }
+        }
+            .coluna {
+                width: 100%;
+            }
+        }
+        }
+    </style>
+</head>
+<body>
+    <h2 id="titulo"></h2>
+
+    <div class="container">
+        <div class="coluna">
+            <div class="header" onclick="toggleLista('especiais_lista')">Especiais ▼</div>
+            <div id="especiais_lista" class="lista"></div>
+        </div>
+
+        <div class="coluna">
+            <div class="header" onclick="toggleLista('negros_lista')">Negros ▼</div>
+            <div id="negros_lista" class="lista"></div>
+        </div>
+
+        <div class="coluna">
+            <div class="header" onclick="toggleLista('geral_lista')">Geral ▼</div>
+            <div id="geral_lista" class="lista"></div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getDatabase, ref, get, update } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "SUA_API_KEY",
+            authDomain: "SEU_DOMINIO.firebaseapp.com",
+            databaseURL: "https://tj-convoc-default-rtdb.firebaseio.com",
+            projectId: "tj-convoc",
+            storageBucket: "tj-convoc.appspot.com",
+            messagingSenderId: "",
+            appId: ""
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const cidade = urlParams.get("cidade");
+        document.getElementById("titulo").textContent = `Cidade: ${cidade}`;
+
+        const divEspeciais = document.getElementById("especiais_lista");
+        const divNegros = document.getElementById("negros_lista");
+        const divGeral = document.getElementById("geral_lista");
+
+        async function carregar() {
+            const snap = await get(ref(db, cidade));
+            const dados = snap.val();
+
+            montarLista("especiais", dados.especiais, divEspeciais);
+            montarLista("negros", dados.negros, divNegros);
+            montarLista("geral", dados.geral, divGeral);
+        }
+
+        function montarLista(tipo, lista, div) {
+            div.innerHTML = "";
+
+            lista.filter(p => p.Conv_DJE !== "Sim")
+                .forEach((pessoa, index) => {
+                    const item = document.createElement("div");
+                    item.className = "item";
+
+                    item.innerHTML = `
+                        <b>${pessoa.Classif_Final}</b> - ${pessoa.Nome}<br>
+                        <label>
+                            Data:
+                            <input type="date" id="data_${tipo}_${index}">
+                        </label>
+                        <label style="margin-left: 10px;">
+                            Convocado:
+                            <input type="checkbox" id="check_${tipo}_${index}">
+                        </label><br><br>
+                        <button id="ok_${tipo}_${index}">OK</button>
+                        <button id="copiar_${tipo}_${index}" style="margin-left: 5px;">Copiar</button>
+                    `;
+
+                    div.appendChild(item);
+
+                    const inputData = document.getElementById(`data_${tipo}_${index}`);
+                    const inputCheck = document.getElementById(`check_${tipo}_${index}`);
+
+                    if (pessoa.Data && pessoa.Data !== "null") {
+                        const partes = pessoa.Data.split("/");
+                        inputData.value = `${partes[2]}-${partes[1]}-${partes[0]}`;
+                    }
+                    if (pessoa.Conv_DJE === "Sim") inputCheck.checked = true;
+
+                    document.getElementById(`ok_${tipo}_${index}`).onclick = () => salvar(pessoa, tipo, index, lista, inputData, inputCheck);
+                    document.getElementById(`copiar_${tipo}_${index}`).onclick = () => {
+                        navigator.clipboard.writeText(pessoa.Nome);
+                    };
+                });
+        }
+
+        async function salvar(pessoa, tipo, index, lista, inputData, inputCheck) {
+            const dataBr = inputData.value ? inputData.value.split("-").reverse().join("/") : "null";
+            const conv = inputCheck.checked ? "Sim" : "null";
+
+            await update(ref(db, `${cidade}/${tipo}/${index}`), { Data: dataBr, Conv_DJE: conv });
+            sincronizarNasListas(pessoa.Inscrição, dataBr, conv);
+            carregar();
+        }
+
+        async function sincronizarNasListas(inscricao, data, conv) {
+            const snap = await get(ref(db, cidade));
+            const dados = snap.val();
+
+            ["geral", "negros", "especiais"].forEach(listaNome => {
+                dados[listaNome].forEach((p, i) => {
+                    if (p.Inscrição === inscricao) {
+                        update(ref(db, `${cidade}/${listaNome}/${i}`), { Data: data, Conv_DJE: conv });
+                    }
+                });
+            });
+        }
+
+        window.toggleLista = function(id) {
+            const lista = document.getElementById(id);
+            const header = lista.previousElementSibling;
+
+            if (lista.style.display === "none") {
+                lista.style.display = "block";
+                header.innerHTML = header.innerHTML.replace('►', '▼');
+            } else {
+                lista.style.display = "none";
+                header.innerHTML = header.innerHTML.replace('▼', '►');
+            }
+        }
+
+        carregar();
+    </script>
+</body>
+</html>

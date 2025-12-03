@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Selecionar Cidade TJ-SP</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f2f2f2;
+            margin: 0;
+            padding: 20px;
+            text-align: center;
+        }
+
+        h2 {
+            margin-bottom: 20px;
+        }
+
+        #listaCidades {
+            max-width: 400px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .cidade-btn {
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #4a90e2, #357ABD);
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.15);
+            transition: transform 0.15s, opacity 0.2s;
+        }
+
+        .cidade-btn:hover {
+            opacity: 0.9;
+            transform: scale(1.03);
+        }
+
+        @media (max-width: 600px) {
+            .cidade-btn {
+                font-size: 18px;
+                padding: 14px;
+            }
+        }
+    </style>
+<style>
+        @media (max-width: 600px) {
+            button {
+                width: 100% !important;
+                padding: 18px !important;
+                font-size: 1.2rem !important;
+                margin: 10px 0 !important;
+                border-radius: 12px !important;
+            }
+            body {
+                padding: 12px !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h2>Selecione a Cidade</h2>
+
+    <div id="listaCidades"></div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "SUA_API_KEY",
+            authDomain: "SEU_DOMINIO.firebaseapp.com",
+            databaseURL: "https://tj-convoc-default-rtdb.firebaseio.com",
+            projectId: "tj-convoc",
+            storageBucket: "tj-convoc.appspot.com",
+            messagingSenderId: "",
+            appId: ""
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        const listaCidades = document.getElementById("listaCidades");
+
+        async function carregarCidades() {
+            const snap = await get(ref(db, "/"));
+            const cidades = Object.keys(snap.val());
+
+            cidades.forEach(c => {
+                const btn = document.createElement("button");
+                btn.textContent = c;
+                btn.className = "cidade-btn";
+                btn.onclick = () => {
+                    window.location.href = `editar.html?cidade=${encodeURIComponent(c)}`;
+                };
+                listaCidades.appendChild(btn);
+            });
+        }
+
+        carregarCidades();
+    </script>
+</body>
+</html>

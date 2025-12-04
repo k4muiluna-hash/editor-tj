@@ -64,8 +64,12 @@
             display: flex;
             align-items: center;
             gap: 25px;
-            margin-top: 10px;
+            margin: 10px 0;
+	    justify-content: space-between;
         }
+    	.convoc-field {
+    		display: flex;
+	    }
 
         .date-field {
             display: flex;
@@ -123,8 +127,8 @@
             }
 
             .field-row {
-                flex-direction: column;
-                align-items: flex-start;
+                flex-direction: row
+                align-items: center;
                 gap: 12px;
             }
 
@@ -223,10 +227,10 @@
                             <input type="date" id="data_${tipo}_${indexReal}">
                         </div>
 
-                        <label class="checkbox-label">
-                            <input type="checkbox" id="check_${tipo}_${indexReal}">
-                            Convocado
-                        </label>
+                        <div class="convoc-field">
+            				<input type="checkbox" id="check_${tipo}_${indexReal}">
+                            <label class="checkbox-label">Convocado</label>
+            			</div>
                     </div>
 
                     <button class="ok-btn" data-index="${indexReal}">OK</button>
@@ -308,3 +312,4 @@
 </body>
 
 </html>
+
